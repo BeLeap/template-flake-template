@@ -3,24 +3,23 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-  outputs = { nixpkgs, ... }:
-    let
-      systems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "aarch64-darwin"
-      ];
+  outputs = {nixpkgs, ...}: let
+    systems = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "aarch64-darwin"
+    ];
 
-      forAllSystems = nixpkgs.lib.genAttrs systems;
-    in
-    {
-      devShells = forAllSystems (system: {
-        default = nixpkgs.legacyPackages.${system}.mkShell {
-          packages = with nixpkgs.legacyPackages.${system}; [
-            git
-            alejandra
-          ];
-        };
-      });
-    };
+    forAllSystems = f:
+      nixpkgs.lib.genAttrs systems (system: f system (import nixpkgs {inherit system;}));
+  in {
+    devShells = forAllSystems (system: pkgs: {
+      default = pkgs.mkShell {
+        packages = with pkgs; [
+          git
+          alejandra
+        ];
+      };
+    });
+  };
 }
