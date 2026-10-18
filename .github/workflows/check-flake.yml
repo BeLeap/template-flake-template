@@ -1,18 +1,6 @@
 name: Check Nix flake
 
 on:
-  workflow_call:
-    inputs:
-      flake_dir:
-        description: Directory containing flake.nix
-        required: false
-        type: string
-        default: template
-      ref:
-        description: Git ref to check
-        required: false
-        type: string
-        default: ""
   workflow_dispatch:
     inputs:
       flake_dir:
