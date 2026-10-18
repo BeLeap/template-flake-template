@@ -13,6 +13,8 @@ permissions:
 jobs:
   update-flake-lock:
     runs-on: ubuntu-latest
+    outputs:
+      pull_request_number: ${{ steps.update.outputs.pull-request-number }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -21,9 +23,15 @@ jobs:
         uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Update flake inputs and open a pull request
+        id: update
         uses: DeterminateSystems/update-flake-lock@main
         with:
           path-to-flake-dir: template
 
-      - name: Check updated flake
-        run: nix flake check ./template
+  check-updated-flake:
+    needs: update-flake-lock
+    if: needs.update-flake-lock.outputs.pull_request_number != ''
+    uses: ./.github/workflows/check-flake.yml
+    with:
+      flake_dir: template
+      ref: update_flake_lock_action
