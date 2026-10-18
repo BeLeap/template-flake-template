@@ -1,18 +1,6 @@
 name: Check Nix flake
 
 on:
-  workflow_dispatch:
-    inputs:
-      flake_dir:
-        description: Directory containing flake.nix
-        required: false
-        type: string
-        default: template
-      ref:
-        description: Git ref to check (leave empty to use the selected branch)
-        required: false
-        type: string
-        default: ""
   pull_request:
   push:
 
@@ -25,13 +13,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
-        with:
-          ref: ${{ inputs.ref || github.ref }}
 
       - name: Install Nix
         uses: DeterminateSystems/determinate-nix-action@v3
 
       - name: Check flake
-        env:
-          FLAKE_DIR: ${{ inputs.flake_dir || 'template' }}
-        run: nix flake check "./$FLAKE_DIR"
+        run: nix flake check ./template
